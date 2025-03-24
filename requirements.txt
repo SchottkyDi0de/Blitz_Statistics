@@ -1,6 +1,6 @@
 py-cord==2.6.0
 pyyaml==6.0.1
-aiohttp==3.8.5
+aiohttp==3.10.0
 asynciolimiter==1.0.0
 python-easy-json==1.1.9
 python-dotenv==1.0.0
@@ -17,7 +17,7 @@ websockets==12.0
 nicegui==1.4.24
 typer==0.12.3
 dynamic-yaml==2.0.0
-motor==3.4.0
+motor==3.6.0
 asgiref==3.8.1
 numpy==2.0.0
 filesplit==4.0.1

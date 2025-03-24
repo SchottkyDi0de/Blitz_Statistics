@@ -37,6 +37,20 @@ _config = Config().get()
 _custom_timeout = aiohttp.ClientTimeout(total=10, connect=4, sock_read=2, sock_connect=4)
 
 
+class SessionWrapper:
+    session: aiohttp.ClientSession
+
+    def __init__(self):
+        self.session = None
+
+    def __getattr__(self, name: str):
+        return getattr(self.session, name)
+    
+    async def check_session(self):
+        if self.session is None or self.session.closed:
+            self.session = aiohttp.ClientSession()
+
+
 @singleton
 class API:
     def __init__(self) -> None:
@@ -48,24 +62,12 @@ class API:
         self.rating_leaderboard_num_cache = Cache(ttl=210)
         self.cache = FIFOCache(maxsize=100, ttl=60)
         self.pdb = PlayersDB()
-        self.session = aiohttp.ClientSession()
-        self._session = self.session
+        self.session: aiohttp.ClientSession = SessionWrapper()
 
         self.player_stats = {}
         self.player = {}
         
         atexit.register(self.__at_exit__)
-    
-    @property
-    def session(self) -> aiohttp.ClientSession:
-        if self._session.closed:
-            self._session = aiohttp.ClientSession()
-        
-        return self._session
-
-    @session.setter
-    def session(self, session: aiohttp.ClientSession) -> None:
-        self._session = session
 
     def _get_id_by_reg(self, reg: str) -> str:
         reg = reg.lower()
@@ -200,6 +202,8 @@ class API:
         Returns:
             list[PlayerStats | bool]: A list of PlayerStats objects representing the statistics of each player. If an error occurs during the retrieval, a boolean value indicating the success of the operation is returned.
         """
+        await self.session.check_session()
+
         self._players_stats = []
         
         async with self.session:
@@ -223,6 +227,7 @@ class API:
             None
         """
         await self.rate_limiter.wait()
+        await self.session.check_session()
         
         url_get_stats = insert_data(
             _config.game_api.urls.get_stats,
@@ -270,6 +275,7 @@ class API:
             dict: The tankopedia data.
 
         """
+        await self.session.check_session()
         _log.debug('Get tankopedia data')
         url_get_tankopedia = (
             f'https://{self._get_url_by_reg(region)}/wotb/encyclopedia/vehicles/'
@@ -307,6 +313,7 @@ class API:
     @timeout_handler()
     async def get_players_list(self, search: str, limit: int = 8, peer_reg_timeout: int = 0.75) -> dict[str, str]:
         data = {}
+        await self.session.check_session()
         
         for reg in _config.default.available_regions:
             url_get_players_list = insert_data(
@@ -362,6 +369,7 @@ class API:
         Returns:
             GameAccount: The player's information or None if the player is not found.
         """
+        await self.session.check_session()
         url_get_id = (
             f'https://{self._get_url_by_reg(region)}/wotb/account/list/'
             f'?application_id={self._get_id_by_reg(region)}'
@@ -565,6 +573,7 @@ class API:
             api_exceptions.MoreThanOnePlayerFound: If more than one player is found with the given nickname.
             api_exceptions.NoPlayersFound: If no players are found with the given nickname."""
             
+        await self.session.check_session()
         url_get_id = insert_data(
             _config.game_api.urls.get_id,
             {   
@@ -622,6 +631,7 @@ class API:
         Returns:
             tuple: The number of common and rating battles of the player.
         """
+        await self.session.check_session()
         url_get_battles = (
             f'https://{self._get_url_by_reg(region)}/wotb/account/info/'
             f'?application_id={self._get_id_by_reg(region)}'
@@ -668,6 +678,7 @@ class API:
             EmptyDataError: If the "battles" field is not present in the output data.
             NeedMoreBattlesError: If the player has less than 100 battles.
         """
+        await self.session.check_session()
         url_get_stats = insert_data(
             _config.game_api.urls.get_stats,
             {
@@ -713,6 +724,7 @@ class API:
         Returns:
             None
         """
+        await self.session.check_session()
         url_get_achievements = (
             f'https://{self._get_url_by_reg(region)}/wotb/account/achievements/'
             f'?application_id={self._get_id_by_reg(region)}'
@@ -752,6 +764,7 @@ class API:
             api_exceptions.RequestsLimitExceeded: If the API requests limit is exceeded.
             api_exceptions.SourceNotAvailable: If the API source is not available.
         """
+        await self.session.check_session()
         url_get_clan_stats = (
             f'https://{self._get_url_by_reg(region)}/wotb/clans/accountinfo/'
             f'?application_id={self._get_id_by_reg(region)}'
@@ -804,6 +817,7 @@ class API:
             api_exceptions.RequestsLimitExceeded: If the requests limit has been exceeded.
             api_exceptions.SourceNotAvailable: If the data source is not available.
         """
+        await self.session.check_session()
         url_get_tanks_stats = (
             f'https://{self._get_url_by_reg(region)}/wotb/tanks/stats/'
             f'?application_id={self._get_id_by_reg(region)}'
@@ -833,6 +847,7 @@ class API:
         )
     )
     async def get_rating_leaderboard_num(self, region: int | str, account_id: int | str) -> None:
+        await self.session.check_session()
         if region not in ["eu", "asia", "na"]:
             self.player_stats['statistics'].rating.leaderboard_position = 0
             return
