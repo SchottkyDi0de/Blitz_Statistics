@@ -1,4 +1,5 @@
 import os
+import sys
 
 from typer import Typer
 import yaml
@@ -42,7 +43,8 @@ def launch(mode: str):
             yaml.dump(config, f, indent=2, sort_keys=False)
         
         print('Done...')
-        os.system(f'python main.py {env_config.DISCORD_TOKEN_DEV}')
+        command = ' '.join((sys.executable, "main.py", env_config.DISCORD_TOKEN_DEV))
+        os.system(command)
     else:
         raise ValueError('Invalid mode. Must be either "prod" or "dev"')
 
