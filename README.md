@@ -19,7 +19,7 @@ IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM,
 This license applies to all files in this project that contain Python source code unless otherwise specified!
 
 # Command documentation
-View docs in [![GitBook](https://img.shields.io/badge/GitBook-3884FF?logo=gitbook&logoColor=fff)](https://app.gitbook.com/o/9RFxNaj85lLDapYNGcmG/s/b4GsEBEoNIIQn6fZtOGp/ru-docs/glavnaya-stranica-ru-dokumentacii/bystryi-start)
+View docs in [![GitBook](https://img.shields.io/badge/GitBook-3884FF?logo=gitbook&logoColor=fff)](https://blitzhub.gitbook.io/blitz-statistics-bot)
 
 # Used libriares:
 py-cord 2.6.0
