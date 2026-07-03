@@ -25,7 +25,7 @@ from lib.data_classes.db_player import (
 from lib.data_classes.db_player_old import DBPlayerOld
 from lib.exceptions import database
 from lib.logger.logger import get_logger
-from lib.settings.settings import Config
+from lib.settings.settings import Config, EnvConfig
 from lib.utils.calculate_exp import exp_add
 from lib.utils.singleton_factory import singleton
 from lib.utils.validate_badges import validate_badge
@@ -37,7 +37,7 @@ _log = get_logger(__file__, 'PlayersDBLogger', 'logs/players_db.log')
 @singleton
 class PlayersDB:
     def __init__(self) -> None:
-        self.client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017")
+        self.client = motor.motor_asyncio.AsyncIOMotorClient(EnvConfig.MONGODB_URI)
         self.db = self.client['PlayersDB']
         self.collection = self.db.get_collection('players', codec_options=CodecOptions(tz_aware=True, tzinfo=pytz.utc))
     

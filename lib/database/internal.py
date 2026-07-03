@@ -3,6 +3,7 @@ import motor.motor_asyncio
 from bson.codec_options import CodecOptions
 
 from lib.logger.logger import get_logger
+from lib.settings.settings import EnvConfig
 from lib.utils.singleton_factory import singleton
 
 _log = get_logger(__file__, 'InternalDBLogger', 'logs/internal_db.log')
@@ -11,7 +12,7 @@ _log = get_logger(__file__, 'InternalDBLogger', 'logs/internal_db.log')
 @singleton
 class InternalDB():
     def __init__(self) -> None:
-        self.client = motor.motor_asyncio.AsyncIOMotorClient("mongodb://localhost:27017")
+        self.client = motor.motor_asyncio.AsyncIOMotorClient(EnvConfig.MONGODB_URI)
         self.db = self.client.get_database('InternalDB')
         self.collection = self.db.get_collection('internal', codec_options=CodecOptions(tz_aware=True, tzinfo=pytz.utc))
         

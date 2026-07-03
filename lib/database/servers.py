@@ -2,13 +2,14 @@ from discord import ApplicationContext
 from motor.motor_asyncio import AsyncIOMotorClient
 
 from lib.data_classes.db_server import DBServer, ServerSettings
+from lib.settings.settings import EnvConfig
 from lib.utils.singleton_factory import singleton
 
 
 @singleton
 class ServersDB():
     def __init__(self) -> None:
-        self.client = AsyncIOMotorClient('mongodb://localhost:27017')
+        self.client = AsyncIOMotorClient(EnvConfig.MONGODB_URI)
         self.db = self.client.get_database('ServersDB')
         self.collection = self.db.get_collection('servers')
 

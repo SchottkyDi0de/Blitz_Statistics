@@ -5,13 +5,14 @@ from shutil import make_archive
 from pymongo import MongoClient
 
 from lib.logger.logger import get_logger
+from lib.settings.settings import EnvConfig
 
 _log = get_logger(__file__, 'DumpHandlerLogger', 'logs/dump_handler.log')
 
 
 class BackUp:
     def __init__(self):
-        self.client = MongoClient('mongodb://localhost:27017/')
+        self.client = MongoClient(EnvConfig.MONGODB_URI)
 
     def _export_to_google_drive(self):
         ...

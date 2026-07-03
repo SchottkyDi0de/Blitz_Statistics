@@ -2,6 +2,7 @@ from motor.motor_asyncio import AsyncIOMotorClient
 
 from lib.data_classes.tankopedia import Tank
 from lib.logger import logger
+from lib.settings.settings import EnvConfig
 from lib.utils.singleton_factory import singleton
 
 _log = logger.get_logger(__file__, 'TankopediaLogger', 'logs/tankopedia.log')
@@ -10,7 +11,7 @@ _log = logger.get_logger(__file__, 'TankopediaLogger', 'logs/tankopedia.log')
 @singleton
 class TankopediaDB:
     def __init__(self) -> None:
-        self.client = AsyncIOMotorClient("mongodb://localhost:27017")
+        self.client = AsyncIOMotorClient(EnvConfig.MONGODB_URI)
         
         self.db = self.client.get_database('TankopediaDB')
         

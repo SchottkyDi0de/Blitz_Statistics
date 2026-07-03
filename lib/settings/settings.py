@@ -39,6 +39,8 @@ class EnvConfig():
 
     INTERNAL_API_KEY = os.getenv('INTERNAL_API_KEY')
 
+    MONGODB_URI = os.getenv('MONGODB_URI', 'mongodb://localhost:27017')
+
 
 @singleton
 class Config():
